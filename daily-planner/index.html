@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>日日 · 计划与目标</title>
+<style>
+  :root {
+    --bg: #FAEDD1;
+    --surface: #FFFFFF;
+    --surface-2: #F6F0F7;
+    --ink: #3A2D23;
+    --ink-2: #8C7A6A;
+    --ink-3: #B8A99A;
+    --line: #F1E5DA;
+    --accent: #22C55E;
+    --accent-strong: #16A34A;
+    --accent-soft: #E3F8EC;
+    --amber: #E58B3A;
+    --seal: #D8432F;
+    --danger: #DC4A3D;
+    --ring-track: #F3E9DE;
+    --stamp-bg: #FFFFFF;
+    --page-a: #FDEAF2;
+    --page-b: #FAEDD1;
+    --page-c: #E9F6EF;
+    --page-bg: linear-gradient(135deg, #FDE3EC 0%, #FBEDDC 22%, #E9F5EC 45%, #E2EFFA 66%, #F0E7FA 85%, #FBEDDC 100%);
+    --app-bg: linear-gradient(180deg, #FCE2ED 0%, #FAEDD1 26%, #FAEDD1 74%, #E6F5ED 100%);
+    --done-bg: #B0E7C2;
+    --done-border: #6ED39A;
+    --shadow-sm: 0 1px 2px rgba(38,49,43,.06);
+    --shadow-md: 0 8px 24px rgba(38,49,43,.10);
+    --shadow-lg: 0 16px 40px rgba(38,49,43,.20);
+    --radius: 16px;
+    --radius-sm: 10px;
+  }
+  body.dark {
+    --bg: #2A211B;
+    --surface: #352B23;
+    --surface-2: #3E332A;
+    --ink: #F4EDE4;
+    --ink-2: #C4B4A2;
+    --ink-3: #8F7F6E;
+    --line: #4A3D31;
+    --accent: #22C55E;
+    --accent-strong: #4ADE80;
+    --accent-soft: #1F3A29;
+    --amber: #E9A24E;
+    --seal: #E06A5A;
+    --danger: #E06A5A;
+    --ring-track: #44392E;
+    --stamp-bg: #2A211B;
+    --page-a: #2E241C;
+    --page-b: #241B15;
+    --page-c: #1D2A20;
+    --page-bg: linear-gradient(135deg, #301F22 0%, #2A211B 22%, #22302A 45%, #1E2932 66%, #282238 85%, #2A211B 100%);
+    --app-bg: linear-gradient(180deg, #34241F 0%, #2A211B 26%, #2A211B 74%, #22302A 100%);
+    --done-bg: #1F3A29;
+    --done-border: #2E5540;
+    --shadow-sm: 0 1px 2px rgba(0,0,0,.35);
+    --shadow-md: 0 8px 24px rgba(0,0,0,.42);
+    --shadow-lg: 0 16px 40px rgba(0,0,0,.55);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+
+  body {
+    background: var(--page-bg);
+    color: var(--ink);
+    font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", "Noto Sans SC", sans-serif;
+    -webkit-font-smoothing: antialiased;
+    display: flex; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 24px 12px;
+    transition: background .3s ease;
+  }
+
+  .serif { font-family: "Noto Serif SC", "Songti SC", "STSong", "SimSun", serif; letter-spacing: .01em; }
+
+  .app {
+    width: 100%; max-width: 430px;
+    height: 800px; max-height: calc(100vh - 48px);
+    background: var(--app-bg);
+    border-radius: 28px; overflow: hidden;
+    display: flex; flex-direction: column; position: relative;
+    box-shadow: 0 30px 80px rgba(38,49,43,.28), 0 4px 14px rgba(38,49,43,.12);
+    border: 1px solid var(--line);
+  }
+
+  .scroll { flex: 1; overflow-y: auto; padding: 20px 18px 24px; scrollbar-width: none; }
+  .scroll::-webkit-scrollbar { display: none; }
+
+  .masthead { padding: 6px 4px 2px; display: flex; align-items: center; justify-content: space-between; }
+  .brand { font-size: 20px; font-weight:700; }
+  .brand em { font-style: normal; color: var(--accent); }
+  .masthead-r { display: flex; align-items: center; gap: 10px; }
+  .today-sub { font-size: 13px; color: var(--ink-2); }
+  .theme-btn { border: none; background: none; cursor: pointer; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: var(--ink-2); transition: background .18s ease, color .18s ease; }
+  .theme-btn:hover { background: var(--surface-2); color: var(--ink); }
+  .theme-btn svg { width: 17px; height: 17px; }
+  .theme-btn .moon { display: none; }
+  body.dark .theme-btn .moon { display: block; }
+  body.dark .theme-btn .sun { display: none; }
+
+  .theme-reveal { position: fixed; inset: 0; pointer-events: none; z-index: 100; opacity: 0; }
+
+  .hero-date { margin: 14px 0 16px; animation: rise .5s ease both; }
+  .hero-date .day { font-size: 44px; line-height: 1; font-weight: 600; }
+  .hero-date .meta { margin-top: 8px; font-size: 14px; color: var(--ink-2); }
+  .hero-date .meta .yr { color: var(--ink-3); }
+
+  .progress-card { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px 16px; box-shadow: var(--shadow-sm); margin-bottom: 16px; }
+  .progress-row { display: flex; align-items: center; gap: 14px; }
+  .ring { position: relative; width: 52px; height: 52px; flex: none; }
+  .ring svg { transform: rotate(-90deg); }
+  .ring .val { position: absolute; inset: 0; display: flex; align-items: baseline; justify-content: center; font-size: 15px; font-weight: 700; color: var(--accent-strong); padding-top: 17px; }
+  .ring .val .pc { font-size: 8px; color: var(--ink-3); font-weight: 600; margin-left: 1px; }
+  .progress-txt .t { font-size: 15px; font-weight: 600; }
+  .progress-txt .s { font-size: 12.5px; color: var(--ink-2); margin-top: 2px; }
+
+  .steps { display: flex; gap: 3px; margin-top: 13px; }
+  .step { flex: 1; height: 5px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); transition: background .3s ease, border-color .3s ease; transform-origin: center; }
+  .step.on { background: var(--accent); border-color: var(--accent); }
+  .step.just-on { animation: stepPop .5s cubic-bezier(.3,1.6,.4,1); }
+  @keyframes stepPop { 0% { transform: scaleY(1); } 55% { transform: scaleY(2.2); } 100% { transform: scaleY(1); } }
+
+  .week-strip { display: flex; gap: 6px; margin-bottom: 18px; overflow-x: auto; scrollbar-width: none; padding-bottom: 2px; }
+  .week-strip::-webkit-scrollbar { display: none; }
+  .wday { flex: none; width: 56px; padding: 10px 0 12px; border-radius: 14px; border: 1px solid var(--line); background: var(--surface); text-align: center; cursor: pointer; transition: background .18s ease, border-color .18s ease; }
+  .wday:hover { background: var(--surface-2); }
+  .wday .wd { font-size: 12px; color: var(--ink-2); }
+  .wday .d { font-size: 20px; font-weight: 600; margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .wday .cnt { font-size: 11px; color: var(--ink-3); margin-top: 4px; height: 14px; }
+  .wday.today { background: var(--accent); border-color: var(--accent); }
+  .wday.today .wd, .wday.today .cnt { color: rgba(255,255,255,.88); }
+  .wday.today .d { color: #fff; }
+
+  .section { margin-bottom: 20px; }
+  .section-head { display: flex; align-items: center; justify-content: space-between; margin: 0 2px 10px; }
+  .section-head h2 { font-size: 15px; font-weight: 700; }
+  .section-head .tag { font-size: 12px; color: var(--accent-strong); background: var(--accent-soft); padding: 3px 9px; border-radius: 999px; }
+  .section-head .tag.dim { color: var(--ink-2); background: var(--surface-2); }
+
+  .plan-list { display: flex; flex-direction: column; gap: 8px; }
+  .plan { display: flex; align-items: center; gap: 10px; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 12px 12px; transition: background .25s ease, box-shadow .18s ease, border-color .25s ease; position: relative; }
+  .plan.done { background: var(--surface); border-color: var(--line); }
+  .plan.just-done { animation: cardflash .55s ease; }
+  @keyframes cardflash { 0% { background: #8FE3B1; border-color: var(--accent); } 100% { background: var(--surface); border-color: var(--line); } }
+
+  .grip { flex: none; width: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.5px; cursor: grab; touch-action: none; padding: 10px 0; color: var(--ink-3); margin-left: -3px; }
+  .grip:active { cursor: grabbing; }
+  .grip i { width: 3px; height: 3px; border-radius: 50%; background: currentColor; }
+
+  .plan .time { flex: none; width: 40px; font-size: 13px; color: var(--ink-2); font-weight: 600; font-variant-numeric: tabular-nums; }
+  .plan .body { flex: 1; min-width: 0; cursor: pointer; }
+  .plan .t { font-size: 15px; font-weight: 600; }
+  .plan.done .t { color: var(--ink-3); text-decoration: line-through; }
+
+  .n { font-size: 12px; color: var(--ink-3); margin-top: 3px; line-height: 1.5; white-space: pre-wrap; }
+
+  .check { flex: none; width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line); background: transparent; cursor: pointer; display: flex; align-items: center; justify-content: center; color: transparent; transition: all .2s ease; }
+  .check:hover { border-color: var(--accent); }
+  .plan.done .check { background: var(--accent-strong); border-color: var(--accent-strong); color: #fff; }
+  .check svg { width: 14px; height: 14px; }
+  .check.pop { animation: checkpop .4s cubic-bezier(.2,1.5,.4,1); }
+  @keyframes checkpop { 0% { transform: scale(.5); } 60% { transform: scale(1.3); } 100% { transform: scale(1); } }
+
+  .del { flex: none; width: 22px; height: 22px; border-radius: 7px; border: none; background: none; color: var(--ink-3); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all .18s ease; opacity: .55; }
+  .del:hover { opacity: 1; color: var(--danger); background: var(--surface-2); }
+  .del svg { width: 15px; height: 15px; }
+  .del.confirm { opacity: 1; background: var(--danger); color: #fff; }
+
+  .empty { text-align: center; padding: 26px 16px; color: var(--ink-3); font-size: 13.5px; background: var(--surface-2); border: 1px dashed var(--line); border-radius: var(--radius); }
+  .empty b { color: var(--ink-2); font-weight: 600; }
+
+  .add-btn { display: flex; align-items: center; justify-content: center; gap: 6px; width: 100%; padding: 13px; border-radius: var(--radius-sm); border: 1px dashed var(--accent); background: transparent; color: var(--accent-strong); font-size: 14px; font-weight: 600; cursor: pointer; transition: background .18s ease; }
+  .add-btn:hover { background: var(--accent-soft); }
+
+  .date-strip { display: flex; gap: 6px; overflow-x: auto; margin: 14px 0 16px; scrollbar-width: none; padding-bottom: 2px; }
+  .date-strip::-webkit-scrollbar { display: none; }
+  .dcell { flex: none; width: 52px; padding: 10px 0 12px; border-radius: 14px; text-align: center; cursor: pointer; background: var(--surface); border: 1px solid var(--line); transition: all .15s ease; }
+  .dcell .wd { font-size: 11px; color: var(--ink-2); }
+  .dcell .d { font-size: 19px; font-weight: 600; margin-top: 3px; font-variant-numeric: tabular-nums; }
+  .dcell .m { font-size: 10px; color: var(--ink-3); margin-top: 2px; }
+  .dcell.sel { background: var(--accent-strong); border-color: var(--accent-strong); }
+  .dcell.sel .wd, .dcell.sel .m { color: rgba(255,255,255,.7); }
+  .dcell.sel .d { color: #fff; }
+  .dcell.today { border-color: var(--accent); }
+
+  .goal { background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; position: relative; overflow: hidden; box-shadow: var(--shadow-sm); }
+  .goal-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 12px; }
+  .goal .gtitle { font-size: 16px; font-weight: 700; }
+  .goal .gdesc { font-size: 12.5px; color: var(--ink-2); margin-top: 3px; }
+  .goal .deadline { flex: none; text-align: right; }
+  .goal .deadline .lbl { font-size: 11px; color: var(--ink-3); }
+  .goal .deadline .dd { font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+  .goal .deadline.soon .dd { color: var(--amber); }
+  .goal .deadline.over .dd { color: var(--danger); }
+  .goal .bar-track { height: 8px; background: var(--surface-2); border-radius: 999px; overflow: hidden; margin: 14px 0 6px; }
+  .goal .bar { height: 100%; background: var(--accent); border-radius: 999px; transition: width .4s ease; }
+  .goal .bar.soon { background: var(--amber); }
+  .goal .bar.over { background: var(--danger); }
+  .goal .stats { display: flex; justify-content: space-between; font-size: 12px; color: var(--ink-2); margin-bottom: 12px; }
+  .goal .stats b { color: var(--accent-strong); font-weight: 700; font-variant-numeric: tabular-nums; }
+  .trail { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 14px; }
+  .dot { width: 14px; height: 14px; border-radius: 50%; background: var(--surface-2); border: 1px solid var(--line); transition: all .2s ease; }
+  .dot.on { background: var(--accent); border-color: var(--accent); }
+  .dot.today-dot { outline: 2px solid var(--accent); outline-offset: 1px; }
+  .dot.future { opacity: .45; }
+  .checkin-btn { display: block; width: 100%; padding: 12px; border-radius: 12px; border: none; cursor: pointer; font-size: 14.5px; font-weight: 700; background: var(--accent); color: #fff; transition: transform .1s ease, background .18s; }
+  .checkin-btn:hover { background: var(--accent-strong); }
+  .checkin-btn:active { transform: scale(.97); }
+  .checkin-btn.done { background: var(--surface-2); color: var(--accent-strong); border: 1px solid var(--accent-soft); }
+  .checkin-btn.overdue { background: var(--danger); }
+
+  .stamp { position: absolute; bottom: 12px; left: calc(50% - 38px); width: 76px; height: 76px; border: 3px solid var(--seal); color: var(--seal); background: var(--stamp-bg); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: "Noto Serif SC", "Songti SC", serif; font-weight: 700; line-height: 1.05; transform: rotate(-10deg); opacity: 0; pointer-events: none; box-shadow: inset 0 0 0 3px rgba(192,66,47,.12), 0 4px 14px rgba(192,66,47,.25); }
+  .stamp .s-t { font-size: 15px; }
+  .stamp .s-d { font-size: 11px; margin-top: 2px; font-variant-numeric: tabular-nums; }
+  .stamp.play { animation: stamp-in .5s cubic-bezier(.2,1.4,.4,1) forwards; }
+  @keyframes stamp-in { 0% { opacity:0; transform: rotate(-10deg) scale(2.1); } 55% { opacity:1; transform: rotate(-8deg) scale(.94); } 75% { opacity:1; transform: rotate(-10deg) scale(1.04); } 100% { opacity:1; transform: rotate(-10deg) scale(1); } }
+
+  .nav { display: flex; border-top: 1px solid var(--line); background: var(--surface); padding: 8px 10px calc(10px + env(safe-area-inset-bottom)); }
+  .nav button { flex: 1; background: none; border: none; cursor: pointer; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--ink-3); font-size: 11.5px; font-weight: 600; padding: 6px 0; transition: color .18s ease; }
+  .nav button .ico { width: 22px; height: 22px; }
+  .nav button.active { color: var(--accent-strong); }
+
+  .mask { position: absolute; inset: 0; background: rgba(30,40,34,.42); display: flex; align-items: flex-end; z-index: 30; opacity: 0; pointer-events: none; transition: opacity .22s ease; }
+  .mask.show { opacity: 1; pointer-events: auto; }
+  .sheet { width: 100%; background: var(--surface); border-radius: 24px 24px 0 0; padding: 20px 18px calc(22px + env(safe-area-inset-bottom)); transform: translateY(24px); transition: transform .24s ease; max-height: 86%; overflow-y: auto; }
+  .mask.show .sheet { transform: translateY(0); }
+  .sheet h3 { font-size: 17px; font-weight: 700; margin-bottom: 16px; }
+  .field { margin-bottom: 14px; }
+  .field label { display: block; font-size: 12.5px; color: var(--ink-2); margin-bottom: 6px; font-weight: 600; }
+  .field input, .field textarea { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 11px 12px; font-size: 15px; font-family: inherit; color: var(--ink); background: var(--surface-2); outline: none; }
+  .field input:focus, .field textarea:focus { border-color: var(--accent); background: var(--surface); }
+  .sheet .row { display: flex; gap: 10px; }
+  .sheet .row .field { flex: 1; }
+  .chips { display: flex; flex-wrap: wrap; gap: 8px; }
+  .chip { padding: 7px 13px; border-radius: 999px; border: 1px solid var(--line); background: var(--surface-2); font-size: 13px; font-weight: 600; color: var(--ink-2); cursor: pointer; transition: transform .32s cubic-bezier(.34,1.56,.64,1), background .18s ease, color .18s ease, border-color .18s ease; }
+  .chip.sel { background: var(--c); border-color: var(--c); color: #fff; transform: scale(1.12); }
+  .chip.yield-l { transform: translateX(-7px); }
+  .chip.yield-r { transform: translateX(7px); }
+  .sheet .actions { display: flex; gap: 10px; margin-top: 6px; }
+  .sheet .actions button { flex: 1; padding: 13px; border-radius: 12px; font-size: 15px; font-weight: 700; cursor: pointer; border: none; }
+  .btn-ghost { background: var(--surface-2); color: var(--ink-2); }
+  .btn-primary { background: var(--accent); color: #fff; }
+  .btn-primary:hover { background: var(--accent-strong); }
+  .btn-danger { background: var(--danger); color: #fff; }
+
+  .toast { position: absolute; left: 50%; bottom: 92px; transform: translateX(-50%) translateY(8px); background: var(--ink); color: var(--bg); padding: 10px 18px; border-radius: 999px; font-size: 13px; font-weight: 600; opacity: 0; pointer-events: none; transition: all .25s ease; z-index: 40; white-space: nowrap; }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .plan.dragging { position: fixed; z-index: 50; box-shadow: var(--shadow-lg); transform: scale(1.02); opacity: .97; pointer-events: none; }
+  .plan-placeholder { border: 1px dashed var(--line); border-radius: var(--radius-sm); background: var(--surface-2); }
+
+  .trash-target { position: absolute; top: 16px; right: 16px; width: 34px; height: 34px; border-radius: 50%; background: var(--danger); color: #fff; display: flex; align-items: center; justify-content: center; z-index: 60; opacity: 0; transform: scale(0); transition: opacity .2s ease, transform .28s cubic-bezier(.34,1.56,.64,1); pointer-events: none; }
+  .trash-target.show { opacity: 1; transform: scale(1); }
+  .trash-target svg { width: 16px; height: 16px; }
+
+  @keyframes rise { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+  @media (max-width: 460px) { body { padding: 0; } .app { max-width: none; height: 100vh; max-height: none; border-radius: 0; border: none; } }
+  @media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+</head>
+<body>
+<div class="app" id="app">
+  <div class="scroll" id="scroll"></div>
+  <nav class="nav" id="nav"></nav>
+  <div class="mask" id="mask"><div class="sheet" id="sheet"></div></div>
+  <div class="toast" id="toast"></div>
+  <div class="trash-target" id="trash"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></div>
+  <div class="theme-reveal" id="theme-reveal"></div>
+</div>
+
+<script>
+/* ================= data layer ================= */
+const STORE_KEY = 'riri_planner_v3';
+const Store = {
+  read() { try { const r = localStorage.getItem(STORE_KEY); if (r) return JSON.parse(r); } catch(e){} return null; },
+  write(d) { localStorage.setItem(STORE_KEY, JSON.stringify(d)); }
+};
+
+/* ================= dates ================= */
+const WD = ['星期日','星期一','星期二','星期三','星期四','星期五','星期六'];
+const pad = n => String(n).padStart(2,'0');
+const toStr = d => `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}`;
+const parse = s => { const [y,m,d] = s.split('-').map(Number); return new Date(y,m-1,d); };
+const addDays = (d,n) => { const x = new Date(d); x.setDate(x.getDate()+n); return x; };
+const daysBetween = (a,b) => Math.round((parse(b)-parse(a))/86400000);
+const fmtMD = s => { const d = parse(s); return `${d.getMonth()+1}月${d.getDate()}日`; };
+const fmtLong = s => { const d = parse(s); return `${d.getMonth()+1}月${d.getDate()}日 · ${WD[d.getDay()]}`; };
+const today = () => new Date();
+const todayStr = () => toStr(today());
+const tomorrowStr = () => toStr(addDays(today(),1));
+const uid = () => Math.random().toString(36).slice(2,10);
+const TAGS = { '工作':'#3E6B4F', '学习':'#4A6B8A', '生活':'#C0782F', '运动':'#C0422F', '其他':'#98A392' };
+
+/* ================= seed ================= */
+function seed() {
+  const t = todayStr(), t1 = tomorrowStr();
+  const rows = [
+    { title:'晨跑 3 公里', time:'07:30', date:t, done:true, tag:'运动' },
+    { title:'产品需求评审', time:'10:00', date:t, done:true, tag:'工作', note:'会议室 B，带上原型稿' },
+    { title:'与导师开会', time:'14:30', date:t, done:false, tag:'工作' },
+    { title:'阅读《认知觉醒》30 分钟', time:'20:00', date:t, done:false, tag:'学习', note:'第 4 章' },
+    { title:'团队周会', time:'09:00', date:t1, done:false, tag:'工作' },
+    { title:'整理项目文档', time:'15:00', date:t1, done:false, tag:'工作', note:'归档到云盘，顺便清理桌面' },
+    { title:'健身房', time:'19:30', date:t1, done:false, tag:'运动' },
+    { title:'交房租', time:'12:00', date:toStr(addDays(today(),2)), done:false, tag:'生活' },
+    { title:'体检预约', time:'08:30', date:toStr(addDays(today(),3)), done:false, tag:'生活' },
+    { title:'给家里打电话', time:'21:00', date:toStr(addDays(today(),4)), done:false, tag:'生活' },
+  ];
+  const plans = rows.map((r,i) => ({ id: uid(), order: i, ...r }));
+  const goals = [
+    { id:uid(), title:'备考雅思 7.5', targetDate:toStr(addDays(today(),42)), startDate:toStr(addDays(today(),-20)), desc:'每天背 50 词 + 一篇阅读', checkins:{} },
+    { id:uid(), title:'减重 5 公斤', targetDate:toStr(addDays(today(),15)), startDate:toStr(addDays(today(),-12)), desc:'控糖 + 每周三次有氧', checkins:{} },
+    { id:uid(), title:'读完 6 本书', targetDate:toStr(addDays(today(),60)), startDate:toStr(addDays(today(),-8)), desc:'睡前读书半小时', checkins:{} },
+  ];
+  const g1 = goals[0];
+  for (let i=-19;i<=-3;i++) if (i%3!==0) g1.checkins[toStr(addDays(today(),i))]=true;
+  g1.checkins[toStr(addDays(today(),-1))]=true;
+  const g2 = goals[1];
+  for (let i=-11;i<=-1;i++) if (i%2===0) g2.checkins[toStr(addDays(today(),i))]=true;
+  return { plans, goals };
+}
+
+/* ================= state ================= */
+let state = Store.read();
+if (!state) { state = seed(); Store.write(state); }
+let tab = 'today';
+let selPlanDate = todayStr();
+let lastCounts = {};
+
+const $ = s => document.querySelector(s);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const scroll = $('#scroll'), nav = $('#nav');
+
+function plansOn(dateStr) { return state.plans.filter(p => p.date === dateStr).sort((a,b) => (a.order??0) - (b.order??0)); }
+function planCount(dateStr) { return state.plans.filter(p => p.date === dateStr).length; }
+
+/* ================= number rolling ================= */
+function animateNumber(el, from, to, dur=600) {
+  if (from === to) { el.textContent = to; return; }
+  const start = performance.now();
+  (function step(now) {
+    const t = Math.min(1, (now-start)/dur), e = 1 - Math.pow(1-t,3);
+    el.textContent = Math.round(from + (to-from)*e);
+    if (t < 1) requestAnimationFrame(step); else el.textContent = to;
+  })(start);
+}
+const RING_C = 2 * Math.PI * 22;
+function setRing(el, p) { el.setAttribute('stroke-dashoffset', RING_C * (1 - p/100)); }
+function animateRingTo(el, from, to, dur=600) {
+  const start = performance.now();
+  (function step(now) {
+    const t = Math.min(1, (now-start)/dur), e = 1 - Math.pow(1-t,3);
+    const v = from + (to-from)*e;
+    el.setAttribute('stroke-dashoffset', RING_C * (1 - v/100));
+    if (t < 1) requestAnimationFrame(step);
+  })(start);
+}
+function runCounters(scope) {
+  scope = scope || scroll;
+  scope.querySelectorAll('[data-count]').forEach(el => {
+    const key = el.dataset.key, to = parseInt(el.dataset.count,10);
+    const prev = lastCounts[key];
+    if (el.dataset.ring !== undefined) {
+      if (prev === undefined) setRing(el, to); else if (prev !== to) animateRingTo(el, prev, to);
+    } else {
+      if (prev === undefined || prev === to) el.textContent = to; else animateNumber(el, prev, to);
+    }
+    lastCounts[key] = to;
+  });
+}
+
+/* ================= render ================= */
+function render() {
+  renderNav();
+  if (tab === 'today') renderToday();
+  else if (tab === 'plan') renderPlan();
+  else renderGoals();
+  runCounters();
+}
+
+function renderNav() {
+  const items = [
+    { k:'today', label:'今日', ico:'<path d="M8 2v3M16 2v3M3.5 9h17M5 5h14a1.5 1.5 0 0 1 1.5 1.5V19a1.5 1.5 0 0 1-1.5 1.5H5A1.5 1.5 0 0 1 3.5 19V6.5A1.5 1.5 0 0 1 5 5Z"/>' },
+    { k:'plan', label:'计划', ico:'<path d="M4 5h16M4 12h16M4 19h10"/>' },
+    { k:'goals', label:'目标', ico:'<circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5"/><path d="M12 3.5V1.8M12 22.2v-1.7M3.5 12H1.8M22.2 12h-1.7"/>' },
+  ];
+  nav.innerHTML = '';
+  items.forEach(it => {
+    const b = document.createElement('button');
+    b.className = tab === it.k ? 'active' : '';
+    b.innerHTML = `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${it.ico}</svg><span>${it.label}</span>`;
+    b.onclick = () => { tab = it.k; selPlanDate = todayStr(); render(); };
+    nav.appendChild(b);
+  });
+}
+
+function masthead(brandHTML, sub) {
+  return `<div class="masthead"><span class="brand">${brandHTML}</span>
+    <div class="masthead-r"><span class="today-sub">${sub}</span>
+      <button class="theme-btn" onclick="toggleTheme(event)" aria-label="切换主题">
+        <svg class="sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+        <svg class="moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8Z"/></svg>
+      </button>
+    </div></div>`;
+}
+
+function noteHTML(note) {
+  if (!note) return '';
+  return `<div class="n">${esc(note)}</div>`;
+}
+
+function planHTML(p, showGrip, z) {
+  return `<div class="plan ${p.done?'done':''}" data-id="${p.id}" ${z!=null?`style="z-index:${z}"`:''}>
+    ${showGrip?'<span class="grip"><i></i><i></i><i></i></span>':''}
+    <div class="time">${p.time||''}</div>
+    <div class="body">
+      <div class="t">${esc(p.title)}</div>
+      ${noteHTML(p.note)}
+    </div>
+    <button class="del" data-id="${p.id}" aria-label="删除"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 7h16M9 7V5a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2M6 7l1 13a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1l1-13"/></svg></button>
+    <button class="check" data-id="${p.id}" aria-label="完成"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12.5l5 5L20 6.5"/></svg></button>
+  </div>`;
+}
+function emptyHTML(txt) { return `<div class="empty"><b>${txt}</b><br>点击下方按钮添加计划</div>`; }
+
+/* ---------- today ---------- */
+function renderToday() {
+  const t = todayStr(), t1 = tomorrowStr();
+  const todays = plansOn(t);
+  const done = todays.filter(p=>p.done).length, total = todays.length;
+  const pct = total ? Math.round(done/total*100) : 0;
+
+  const todayHTML = todays.length ? todays.map(p => planHTML(p,false)).join('') : emptyHTML('今天还没有安排');
+  const tmr = plansOn(t1);
+  const tmrHTML = tmr.length ? tmr.map(p => planHTML(p,false)).join('') : emptyHTML('明天还没有安排');
+
+  scroll.innerHTML = `
+    ${masthead('日日<em>·</em>计划', WD[today().getDay()])}
+    <div class="hero-date">
+      <div class="day serif">${today().getMonth()+1}月${today().getDate()}日</div>
+      <div class="meta"><span class="yr">${today().getFullYear()}</span> · 点击事项即可修改</div>
+    </div>
+    <div class="progress-card">
+      <div class="progress-row">
+        <div class="ring">
+          <svg width="52" height="52">
+            <circle cx="26" cy="26" r="22" fill="none" stroke="var(--ring-track)" stroke-width="5"/>
+            <circle id="ring-fg" cx="26" cy="26" r="22" fill="none" style="stroke:var(--accent)" stroke-width="5" stroke-linecap="round" stroke-dasharray="${RING_C}" data-count="${pct}" data-key="today-ring" data-ring="1"/>
+          </svg>
+          <div class="val"><span id="ring-val" data-count="${pct}" data-key="today-pct"></span><span class="pc">%</span></div>
+        </div>
+        <div class="progress-txt">
+          <div class="t">今日进度 <span id="prog-done" data-count="${done}" data-key="today-done"></span> / <span id="prog-total" data-count="${total}" data-key="today-total"></span></div>
+          <div class="s" id="prog-msg">${total ? (done===total ? '今天全部完成，干得漂亮' : `还有 ${total-done} 项待完成`) : '今天还没有计划，添加一个吧'}</div>
+        </div>
+      </div>
+      ${total ? `<div class="steps" id="prog-steps">${todays.map(p=>`<span class="step ${p.done?'on':''}"></span>`).join('')}</div>` : ''}
+    </div>
+    <div class="week-strip">${weekStripHTML()}</div>
+    <div class="section">
+      <div class="section-head"><h2>今天</h2><span class="tag">${fmtLong(t).split('·')[1].trim()}</span></div>
+      <div class="plan-list" id="list-today">${todayHTML}</div>
+    </div>
+    <div class="section">
+      <div class="section-head"><h2>明天</h2><span class="tag dim">${fmtLong(t1).split('·')[1].trim()}</span></div>
+      <div class="plan-list" id="list-tomorrow">${tmrHTML}</div>
+    </div>
+    <button class="add-btn" onclick="openPlanModal('${t}')">＋ 添加今天计划</button>
+  `;
+  bindInteractions({ lists: ['#list-today', '#list-tomorrow'] });
+}
+
+function weekStripHTML() {
+  let out = '';
+  for (let i=0;i<7;i++) {
+    const d = addDays(today(),i), s = toStr(d), cnt = planCount(s);
+    out += `<div class="wday ${i===0?'today':''} ${cnt?'has':''}" onclick="jumpToDay('${s}')">
+      <div class="wd">${i===0?'今天':i===1?'明天':WD[d.getDay()].replace('星期','周')}</div>
+      <div class="d">${d.getDate()}</div><div class="cnt">${cnt ? cnt+' 项' : '—'}</div>
+    </div>`;
+  }
+  return out;
+}
+
+/* ---------- plan page ---------- */
+function renderPlan() {
+  const sel = plansOn(selPlanDate);
+  let strip = '';
+  for (let i=0;i<21;i++) {
+    const d = addDays(today(),i), s = toStr(d);
+    strip += `<div class="dcell ${s===selPlanDate?'sel':''} ${s===todayStr()?'today':''}" onclick="pickPlanDay('${s}')">
+      <div class="wd">${WD[d.getDay()].replace('星期','周')}</div><div class="d">${d.getDate()}</div><div class="m">${d.getMonth()+1}月</div>
+    </div>`;
+  }
+  const isToday = selPlanDate === todayStr(), isTmrw = selPlanDate === tomorrowStr();
+  const headLabel = isToday ? '今天' : isTmrw ? '明天' : '';
+  scroll.innerHTML = `
+    ${masthead('计划', '未来 21 天 · 拖手柄排序')}
+    <div class="hero-date"><div class="day serif" style="font-size:32px">${fmtLong(selPlanDate)}</div></div>
+    <div class="date-strip">${strip}</div>
+    <div class="section">
+      <div class="section-head"><h2>${headLabel || fmtLong(selPlanDate)}</h2><span class="tag">${planCount(selPlanDate)} 项</span></div>
+      <div class="plan-list" id="list-plan">${sel.length ? sel.map(p=>planHTML(p,true)).join('') : emptyHTML('这一天还没有安排')}</div>
+    </div>
+    <button class="add-btn" onclick="openPlanModal('${selPlanDate}')">＋ 添加这一天计划</button>
+  `;
+  bindInteractions({ lists: ['#list-plan'] });
+  if (sel.length) enableDragSort($('#list-plan'));
+}
+
+/* ---------- goals ---------- */
+function renderGoals() {
+  let html = masthead('目标', `${state.goals.length} 个进行中`);
+  html += `<div class="hero-date"><div class="day serif" style="font-size:32px">朝目标，日拱一卒</div></div>`;
+  html += state.goals.length ? state.goals.map(goalHTML).join('') : `<div class="empty"><b>还没有目标</b><br>设定一个带截止日期的目标，开始每日打卡</div>`;
+  html += `<button class="add-btn" style="margin-top:4px" onclick="openGoalModal()">＋ 新建目标</button>`;
+  scroll.innerHTML = html;
+  scroll.querySelectorAll('.goal .stamp').forEach(s => { if (!s.classList.contains('play')) s.classList.add('play'); });
+}
+
+function goalHTML(g) {
+  const t = todayStr();
+  const total = daysBetween(g.startDate, g.targetDate) + 1;
+  const checked = Object.keys(g.checkins).filter(d => d >= g.startDate && d <= g.targetDate).length;
+  const remaining = daysBetween(t, g.targetDate);
+  const pct = total ? Math.round(checked/total*100) : 0;
+  const cls = remaining < 0 ? 'over' : remaining <= 7 ? 'soon' : '';
+  const doneToday = !!g.checkins[t], over = remaining < 0;
+  const totalDots = Math.min(total, 60);
+  let dots = '';
+  for (let i=0;i<totalDots;i++) {
+    const ds = toStr(addDays(parse(g.startDate), i));
+    let c = 'dot';
+    if (g.checkins[ds]) c += ' on'; else if (ds > t) c += ' future';
+    if (ds === t) c += ' today-dot';
+    dots += `<span class="dot ${c}" title="${ds}"></span>`;
+  }
+  const btnLabel = over ? '已过期' : doneToday ? '今日已打卡' : '每日打卡';
+  const btnCls = 'checkin-btn' + (over ? ' overdue' : doneToday ? ' done' : '');
+  return `<div class="goal" data-id="${g.id}">
+    ${doneToday && !over ? `<div class="stamp"><div class="s-t">打卡</div><div class="s-d">${today().getDate()}</div></div>` : ''}
+    <div class="goal-top">
+      <div><div class="gtitle">${esc(g.title)}</div><div class="gdesc">${esc(g.desc||'')}</div></div>
+      <div class="deadline ${cls}"><div class="lbl">目标日期</div><div class="dd">${fmtMD(g.targetDate)}</div></div>
+    </div>
+    <div class="bar-track"><div class="bar ${cls}" style="width:${pct}%"></div></div>
+    <div class="stats">
+      <span>打卡 <b data-count="${checked}" data-key="goal-${g.id}-checked"></b> / ${total} 天</span>
+      <span>${over ? '已过期' : `剩余 <b data-count="${remaining}" data-key="goal-${g.id}-rem"></b> 天`}</span>
+    </div>
+    <div class="trail">${dots}</div>
+    <button class="${btnCls}" onclick="doCheckin('${g.id}')">${btnLabel}</button>
+  </div>`;
+}
+
+/* ---------- interactions ---------- */
+function bindInteractions({ lists }) {
+  scroll.querySelectorAll('.check').forEach(c => {
+    c.onclick = e => { e.stopPropagation(); togglePlan(c.dataset.id); };
+  });
+  scroll.querySelectorAll('.del').forEach(b => {
+    b.onclick = e => {
+      e.stopPropagation();
+      if (b.classList.contains('confirm')) flyDelete(b.dataset.id);
+      else { b.classList.add('confirm'); toast('再点一次确认删除'); setTimeout(()=>b.classList.remove('confirm'), 2200); }
+    };
+  });
+  (lists || []).forEach(sel => {
+    const l = $(sel); if (!l) return;
+    l.querySelectorAll('.plan .body').forEach(body => {
+      body.onclick = () => editPlan(body.closest('.plan').dataset.id);
+    });
+  });
+}
+
+function togglePlan(id) {
+  const p = state.plans.find(x => x.id === id);
+  p.done = !p.done;
+  Store.write(state);
+  const card = scroll.querySelector(`.plan[data-id="${id}"]`);
+  if (card) {
+    card.classList.toggle('done', p.done);
+    const ck = card.querySelector('.check');
+    if (p.done) { ck.classList.add('pop'); card.classList.add('just-done'); setTimeout(()=>{ck.classList.remove('pop');card.classList.remove('just-done');}, 550); }
+  }
+  if (tab === 'today') {
+    const todays = plansOn(todayStr());
+    const idx = todays.findIndex(x => x.id === id);
+    const stepsEl = $('#prog-steps');
+    if (stepsEl && stepsEl.children[idx]) {
+      const st = stepsEl.children[idx];
+      st.classList.toggle('on', p.done);
+      if (p.done) { st.classList.add('just-on'); setTimeout(()=>st.classList.remove('just-on'), 520); }
+    }
+    updateTodayProgress();
+  }
+}
+
+function updateTodayProgress() {
+  const todays = plansOn(todayStr());
+  const done = todays.filter(p=>p.done).length, total = todays.length;
+  const pct = total ? Math.round(done/total*100) : 0;
+  animateNumber($('#prog-done'), lastCounts['today-done'] ?? 0, done); lastCounts['today-done'] = done;
+  $('#prog-total').textContent = total; lastCounts['today-total'] = total;
+  animateNumber($('#ring-val'), lastCounts['today-pct'] ?? 0, pct); lastCounts['today-pct'] = pct;
+  animateRingTo($('#ring-fg'), lastCounts['today-ring'] ?? 0, pct); lastCounts['today-ring'] = pct;
+  $('#prog-msg').textContent = total ? (done===total ? '今天全部完成，干得漂亮' : `还有 ${total-done} 项待完成`) : '今天还没有计划，添加一个吧';
+}
+
+function editPlan(id) { openPlanModal(null, id); }
+
+function flyDelete(id) {
+  const card = scroll.querySelector(`.plan[data-id="${id}"]`);
+  const finish = () => { state.plans = state.plans.filter(p=>p.id!==id); Store.write(state); render(); toast('已删除'); };
+  const trash = $('#trash');
+  if (card && trash) {
+    const rect = card.getBoundingClientRect();
+    trash.classList.add('show');
+    const tr = trash.getBoundingClientRect();
+    const dx = (tr.left + tr.width/2) - (rect.left + rect.width/2);
+    const dy = (tr.top + tr.height/2) - (rect.top + rect.height/2);
+    const anim = card.animate([
+      { transform: 'translate(0,0) scale(1)', opacity: 1 },
+      { transform: `translate(${dx*0.4}px, ${dy*0.55 - 36}px) scale(0.55)`, opacity: 0.85, offset: 0.5 },
+      { transform: `translate(${dx}px, ${dy}px) scale(0.15)`, opacity: 0 }
+    ], { duration: 430, easing: 'cubic-bezier(.4,0,.6,1)' });
+    anim.onfinish = () => { trash.classList.remove('show'); finish(); };
+  } else finish();
+}
+
+/* ---------- drag sort with spring yield ---------- */
+function enableDragSort(listEl) {
+  let d = null;
+  const SP = 'transform .34s cubic-bezier(.34,1.56,.64,1)';
+  listEl.querySelectorAll('.grip').forEach(g => g.addEventListener('pointerdown', onDown));
+
+  function onDown(e) {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    e.preventDefault();
+    const card = e.target.closest('.plan');
+    const cards = [...listEl.querySelectorAll('.plan')];
+    const startIndex = cards.indexOf(card);
+    const r = card.getBoundingClientRect();
+    const ph = document.createElement('div');
+    ph.className = 'plan-placeholder';
+    ph.style.height = r.height + 'px';
+    card.parentNode.insertBefore(ph, card.nextSibling);
+    card.classList.add('dragging');
+    card.style.left = r.left + 'px'; card.style.top = r.top + 'px'; card.style.width = r.width + 'px';
+    d = { card, ph, list: listEl, startY: e.clientY, oy: r.top, h: r.height, index: startIndex };
+    document.addEventListener('pointermove', onMove);
+    document.addEventListener('pointerup', onUp, { once: true });
+  }
+  function others() { return [...d.list.children].filter(c => c !== d.card && c !== d.ph); }
+  function onMove(e) {
+    if (!d) return;
+    d.card.style.top = (d.oy + (e.clientY - d.startY)) + 'px';
+    const midY = d.oy + (e.clientY - d.startY) + d.h / 2;
+    const its = others();
+    let target = 0;
+    for (let i=0;i<its.length;i++) {
+      const r = its[i].getBoundingClientRect();
+      if (midY < r.top + r.height/2) { target = i; break; }
+      target = i + 1;
+    }
+    if (target !== d.index) {
+      const first = new Map(its.map(c => [c, c.getBoundingClientRect().top]));
+      const ref = its[target] || null;
+      if (ref) d.list.insertBefore(d.ph, ref); else d.list.appendChild(d.ph);
+      its.forEach(c => {
+        const delta = first.get(c) - c.getBoundingClientRect().top;
+        if (Math.abs(delta) > 0.5) { c.style.transition = 'none'; c.style.transform = `translateY(${delta}px)`; }
+      });
+      void d.list.offsetHeight;
+      its.forEach(c => { if (c.style.transform) { c.style.transition = SP; c.style.transform = 'translateY(0)'; } });
+      d.index = target;
+    }
+  }
+  function onUp() {
+    if (!d) return;
+    document.removeEventListener('pointermove', onMove);
+    d.list.insertBefore(d.card, d.ph);
+    d.ph.remove();
+    d.card.classList.remove('dragging');
+    d.card.style.left = d.card.style.top = d.card.style.width = '';
+    [...d.list.children].forEach(c => { c.style.transition = ''; c.style.transform = ''; });
+    [...d.list.children].forEach((c,i) => { const p = state.plans.find(x=>x.id===c.dataset.id); if (p) p.order = i; });
+    Store.write(state);
+    d = null;
+  }
+}
+
+/* ---------- jump / pick ---------- */
+window.jumpToDay = function(s) { tab = 'plan'; selPlanDate = s; render(); };
+window.pickPlanDay = function(s) { selPlanDate = s; render(); };
+
+/* ---------- theme toggle ---------- */
+window.toggleTheme = function(e) {
+  const isDark = document.body.classList.contains('dark');
+  const x = e.clientX, y = e.clientY;
+  const reveal = $('#theme-reveal');
+  reveal.style.background = isDark ? '#FAEDD1' : '#2A211B';
+  reveal.style.transition = 'none';
+  reveal.style.clipPath = `circle(0px at ${x}px ${y}px)`;
+  reveal.style.opacity = '1';
+  const r = Math.hypot(Math.max(x, innerWidth - x), Math.max(y, innerHeight - y));
+  requestAnimationFrame(() => {
+    reveal.style.transition = 'clip-path .42s cubic-bezier(.4,0,.2,1)';
+    reveal.style.clipPath = `circle(${r}px at ${x}px ${y}px)`;
+  });
+  setTimeout(() => { document.body.classList.toggle('dark', !isDark); }, 360);
+  setTimeout(() => {
+    reveal.style.transition = 'opacity .25s ease';
+    reveal.style.opacity = '0';
+  }, 430);
+  setTimeout(() => { reveal.style.clipPath = ''; reveal.style.transition = ''; }, 700);
+};
+
+/* ---------- checkin ---------- */
+window.doCheckin = function(id) {
+  const g = state.goals.find(x => x.id === id);
+  const t = todayStr();
+  if (g.checkins[t]) { toast('今天已经打过卡啦'); return; }
+  if (daysBetween(t, g.targetDate) < 0) { toast('目标已过期，可新建目标'); return; }
+  g.checkins[t] = true;
+  Store.write(state);
+  render();
+  const card = scroll.querySelector(`.goal[data-id="${id}"]`);
+  const s = card && card.querySelector('.stamp');
+  if (s) { s.classList.remove('play'); void s.offsetWidth; s.classList.add('play'); }
+  toast('打卡成功 · 继续坚持');
+};
+
+/* ---------- modals ---------- */
+const mask = $('#mask'), sheet = $('#sheet');
+function openModal(inner) { sheet.innerHTML = inner; mask.classList.add('show'); }
+window.closeModal = function() { mask.classList.remove('show'); };
+mask.addEventListener('click', e => { if (e.target === mask) closeModal(); });
+
+function applyChips(chips, picked) {
+  chips.forEach(c => { c.classList.toggle('sel', c.dataset.t === picked); c.classList.remove('yield-l','yield-r'); });
+  if (picked) {
+    const idx = [...chips].findIndex(c => c.dataset.t === picked);
+    if (idx > 0) chips[idx-1].classList.add('yield-l');
+    if (idx >= 0 && idx < chips.length - 1) chips[idx+1].classList.add('yield-r');
+  }
+}
+
+window.openPlanModal = function(dateStr, planId) {
+  const editing = planId ? state.plans.find(x => x.id === planId) : null;
+  const d = editing ? editing.date : dateStr;
+  openModal(`
+    <h3>${editing ? '编辑计划' : '添加计划'} · ${fmtLong(d)}</h3>
+    <div class="field"><label>计划内容</label><input id="f-title" value="${esc(editing?.title||'')}" placeholder="要做什么？"></div>
+    <div class="row">
+      <div class="field"><label>时间</label><input id="f-time" type="time" value="${editing?.time || '09:00'}"></div>
+      <div class="field"><label>日期</label><input id="f-date" type="date" value="${d}"></div>
+    </div>
+    <div class="field"><label>标签（可选）</label><div class="chips" id="f-tags">${Object.keys(TAGS).map(k=>`<span class="chip ${k===editing?.tag?'sel':''}" data-t="${k}" style="--c:${TAGS[k]}">${k}</span>`).join('')}</div></div>
+    <div class="field"><label>备注（可选）</label><input id="f-note" value="${esc(editing?.note||'')}" placeholder="地点、提醒等"></div>
+    <div class="actions">
+      ${editing ? `<button class="btn-danger" onclick="deleteFromModal('${editing.id}')">删除</button>` : ''}
+      <button class="btn-ghost" onclick="closeModal()">取消</button>
+      <button class="btn-primary" onclick="submitPlan(${editing?`'${editing.id}'`:'null'})">${editing ? '保存' : '添加'}</button>
+    </div>
+  `);
+  let picked = editing ? (editing.tag || null) : null;
+  const chips = sheet.querySelectorAll('#f-tags .chip');
+  applyChips(chips, picked);
+  chips.forEach(c => c.onclick = () => { picked = picked === c.dataset.t ? null : c.dataset.t; applyChips(chips, picked); });
+  sheet.__picked = () => picked;
+  setTimeout(() => $('#f-title').focus(), 120);
+};
+
+window.submitPlan = function(id) {
+  const title = $('#f-title').value.trim();
+  if (!title) { toast('请填写计划内容'); return; }
+  const date = $('#f-date').value, time = $('#f-time').value, note = $('#f-note').value.trim();
+  const tag = sheet.__picked ? sheet.__picked() : '';
+  if (id) {
+    const p = state.plans.find(x => x.id === id);
+    Object.assign(p, { title, time, date, note, tag });
+  } else {
+    state.plans.push({ id: uid(), title, time, date, done: false, note, tag, order: planCount(date) });
+  }
+  Store.write(state); closeModal(); render(); toast('已保存');
+};
+
+window.deleteFromModal = function(id) { closeModal(); flyDelete(id); };
+
+window.openGoalModal = function() {
+  openModal(`
+    <h3>新建目标</h3>
+    <div class="field"><label>目标名称</label><input id="g-title" placeholder="例如：备考雅思 7.5"></div>
+    <div class="field"><label>目标日期（截止）</label><input id="g-date" type="date" value="${toStr(addDays(today(),30))}"></div>
+    <div class="field"><label>每日打卡内容（可选）</label><input id="g-desc" placeholder="每天要完成的最小动作"></div>
+    <div class="actions"><button class="btn-ghost" onclick="closeModal()">取消</button><button class="btn-primary" onclick="submitGoal()">创建目标</button></div>
+  `);
+  setTimeout(() => $('#g-title').focus(), 120);
+};
+
+window.submitGoal = function() {
+  const title = $('#g-title').value.trim(), targetDate = $('#g-date').value;
+  if (!title) { toast('请填写目标名称'); return; }
+  if (!targetDate) { toast('请选择目标日期'); return; }
+  if (targetDate < todayStr()) { toast('目标日期需在未来'); return; }
+  state.goals.unshift({ id: uid(), title, targetDate, startDate: todayStr(), desc: $('#g-desc').value.trim(), checkins: {} });
+  Store.write(state); closeModal(); tab = 'goals'; render();
+  toast('目标已创建，从今天开始打卡');
+};
+
+/* ---------- toast ---------- */
+let toastTimer;
+function toast(msg) {
+  const t = $('#toast');
+  t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(() => t.classList.remove('show'), 1800);
+}
+
+/* boot */
+render();
+</script>
+</body>
+</html>
